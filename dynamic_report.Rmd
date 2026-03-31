@@ -1,0 +1,109 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+
+```
+
+## This dynamic report is tracking characteristics regarding short-form content, such as a platform, video length, hastags, and comapring these results to help draw conclusions. 
+
+```{r}
+library(tidyverse)
+library(magick)
+
+# Reading in the data
+logged_data <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQJP_Rgunaou1bjyafu7-9Ga5PfUKm4GD98vFb4mwSrujLq2P1M2R96T9Upe_gSXyu2krPwA8cYmwG7/pub?output=csv")
+  
+# Storing the renamed data with the rename function, under the name of latest_data.
+latest_data <- rename(logged_data, 
+                       timestamp = 1, 
+                       platform = 2, 
+                       video_length_secs = 3, 
+                       hashtag = 4)
+
+
+# Using the nchar function to collect the number of characters in each hashtag, which allows me to create a new numeric value. 
+char_hashtag <- nchar(latest_data$hashtag)
+
+# Creates a new variable which replaces responses with no hashtags with NA
+new_hashtag <- replace(char_hashtag, char_hashtag == 0, NA)
+
+# Splitting the data by platform, to allow for analysis of each platform separately
+split_platform <- split(latest_data, latest_data$platform)
+
+# The mean length in seconds of submissions from Youtube Shorts
+mean_shorts_video_length <- mean(split_platform$`Youtube Shorts`$video_length_secs)
+
+# The mean length in seconds of submissions from Instagram Reels
+mean_reels_video_length <- mean(split_platform$`Instagram Reels`$video_length_secs)
+
+# The mean length in seconds of submissions from TikTok
+mean_tiktok_video_length <- mean(split_platform$`TikTok`$video_length_secs)
+
+# The mean length in seconds of submissions from X Shorts
+mean_x_video_length <- mean(split_platform$`X Shorts`$video_length_secs)
+
+
+```
+
+## The plot below displays the platforms on which the responses used. 
+
+``` {r}
+
+ggplot(data = latest_data) + 
+  geom_bar(aes(x = platform),
+           fill = "#0000FF",) + 
+  labs(title = "Platform which respondents watched short-form content on", 
+       x = "Platform", 
+       y = "Videos submitted")
+
+```
+
+### This report includes a total number of `r length(latest_data$platform)` data points. 
+
+`r length(split_platform$'Instagram Reels'$platform)` of the data points are from Instagram Reels
+
+`r length(split_platform$'Youtube Shorts'$platform)` are from Youtube Shorts, 
+
+`r length(split_platform$'TikTok'$platform)` are from TikTok,
+
+`r length(split_platform$'X Shorts'$platform)` are from X Shorts
+
+
+## One aspect I think is important to explore is the mean video length of the each of the platforms.
+
+The mean video length for Instagram Reels is `r mean_reels_video_length `.
+
+The mean video length for Youtube Shorts is `r mean_shorts_video_length `.
+
+The mean video length for TikTok is `r mean_tiktok_video_length `.
+
+The mean video length for X Shorts is `r mean_x_video_length `.
+
+
+
+## The plot below displays the number of characters used in the first hashtag of the submitted.
+
+  *Please note that the plot does not include responses with no hashtags*
+
+```{r}
+
+ggplot(data = latest_data) +
+  geom_bar(aes(x = new_hashtag, fill = platform)) +
+  labs(title = "Number of characters in first hashtag",
+       subtitle = "Does not include responses with no hashtags", 
+       x = "Number of characters in first hashtag", 
+       y = "Videos submitted")
+
+
+```
+
+Out of all of the data collected, the shortest hashtag contained `r min(new_hashtag, na.rm = TRUE)` characters, and the longest contained `r max(char_hashtag)`
+
