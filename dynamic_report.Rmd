@@ -50,6 +50,9 @@ mean_tiktok_video_length <- mean(split_platform$`TikTok`$video_length_secs)
 # The mean length in seconds of submissions from X Shorts
 mean_x_video_length <- mean(split_platform$`X Shorts`$video_length_secs)
 
+# The mean length in seconds of submissions from other platforms
+mean_other_video_length <- mean(split_platform$`X Shorts`$video_length_secs)
+
 
 ```
 
@@ -76,6 +79,8 @@ ggplot(data = latest_data) +
 
 `r length(split_platform$'X Shorts'$platform)` are from X Shorts
 
+`r length(split_platform$'Other'$platform)` are from other platforms
+
 
 ## One aspect I think is important to explore is the mean video length of the each of the platforms.
 
@@ -86,6 +91,8 @@ The mean video length for Youtube Shorts is `r mean_shorts_video_length `.
 The mean video length for TikTok is `r mean_tiktok_video_length `.
 
 The mean video length for X Shorts is `r mean_x_video_length `.
+
+The mean video length for other platforms is `r mean_other_video_length `.
 
 
 
